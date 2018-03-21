@@ -16,8 +16,8 @@ public class AppRestController {
 	private TwitterService service;
 
 	@RequestMapping(value = "/search", method = RequestMethod.GET, produces = "application/json")
-	public String listar() throws TwitterException {
-		return service.getTwitts("#Madrid")[0];
+	public String listar(String filter) throws TwitterException {
+		return service.getTwitts(filter).iterator().next();
 	}
 
 	
