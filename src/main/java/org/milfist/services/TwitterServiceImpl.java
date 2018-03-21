@@ -1,5 +1,7 @@
 package org.milfist.services;
 
+import java.util.stream.Stream;
+
 import org.springframework.stereotype.Service;
 
 import twitter4j.Query;
@@ -12,22 +14,15 @@ import twitter4j.TwitterFactory;
 @Service
 public class TwitterServiceImpl implements TwitterService {
 
-	public String[] getTwitts(String filter) throws TwitterException {
-		
-		//TODO: Refactor
-		
+	public Stream<String> getTwitts(String filter) throws TwitterException {
 		Twitter twitter = TwitterFactory.getSingleton();
-	    Query query = new Query(filter);
-	    QueryResult result = twitter.search(query);
-	    System.out.println("Tamaño de la lista: " + result.getTweets().size());
-	    
-	    String[] array = new String[result.getTweets().size()];
-	    int count = 0;
-	    for (Status status : result.getTweets()) {
-	    	array[count] = "@" + status.getUser().getScreenName() + ":" + status.getText();
-	    }
-		
-		return array;
+		QueryResult result = twitter.search(new Query(TwitterServiceImpl.HASH.concat(filter)));
+		return result.getTweets().stream().map(status -> this.getFormatedMessage(status));
+	}
+
+	@Override
+	public String getFormatedMessage(Status status) {
+		return "@" + status.getUser().getScreenName() + ":" + status.getText();
 	}
 
 }
