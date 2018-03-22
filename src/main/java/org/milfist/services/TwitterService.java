@@ -8,6 +8,8 @@ import twitter4j.TwitterException;
 public interface TwitterService {
 	
 	public static final String HASH = "#";
+	public static final String AT = "@";
+	public static final String COLON = ":";
 
 	public Stream<String> getTwitts(String filter) throws TwitterException;
 
