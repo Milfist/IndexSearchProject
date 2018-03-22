@@ -16,13 +16,13 @@ public class TwitterServiceImpl implements TwitterService {
 
 	public Stream<String> getTwitts(String filter) throws TwitterException {
 		Twitter twitter = TwitterFactory.getSingleton();
-		QueryResult result = twitter.search(new Query(TwitterServiceImpl.HASH.concat(filter)));
+		QueryResult result = twitter.search(new Query(HASH.concat(filter)));
 		return result.getTweets().stream().map(status -> this.getFormatedMessage(status));
 	}
 
 	@Override
 	public String getFormatedMessage(Status status) {
-		return "@" + status.getUser().getScreenName() + ":" + status.getText();
+		return AT + status.getUser().getScreenName() + COLON + status.getText();
 	}
 
 }
