@@ -1,8 +1,12 @@
 package org.milfist.services;
 
+import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.springframework.stereotype.Service;
+
+import com.google.gson.Gson;
 
 import twitter4j.Query;
 import twitter4j.QueryResult;
@@ -14,6 +18,14 @@ import twitter4j.TwitterFactory;
 @Service
 public class TwitterServiceImpl implements TwitterService {
 
+	public List<?> getTwitts2(String filter) throws TwitterException {
+		Twitter twitter = TwitterFactory.getSingleton();
+		QueryResult result = twitter.search(new Query(HASH.concat(filter)));
+		Gson gson = new Gson();		 
+        return result.getTweets().stream().map(gson::toJson).collect(Collectors.toList());
+		
+	}
+	
 	public Stream<String> getTwitts(String filter) throws TwitterException {
 		Twitter twitter = TwitterFactory.getSingleton();
 		QueryResult result = twitter.search(new Query(HASH.concat(filter)));
