@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.google.gson.Gson;
@@ -18,11 +19,21 @@ import twitter4j.TwitterFactory;
 @Service
 public class TwitterServiceImpl implements TwitterService {
 
+	@Autowired
+	private ElasticSearchService esService;
+	
 	public List<?> getTwitts2(String filter) throws TwitterException {
 		Twitter twitter = TwitterFactory.getSingleton();
 		QueryResult result = twitter.search(new Query(HASH.concat(filter)));
-		Gson gson = new Gson();		 
-        return result.getTweets().stream().map(gson::toJson).collect(Collectors.toList());
+		Gson gson = new Gson();		
+		
+		// TODO Refactor
+		List<?> list = result.getTweets().stream().map(gson::toJson).collect(Collectors.toList()); 
+		
+		this.esService.indexing(list, filter);		
+				
+				
+        return list;
 		
 	}
 	
