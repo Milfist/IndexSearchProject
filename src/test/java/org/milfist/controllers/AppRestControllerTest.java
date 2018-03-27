@@ -1,8 +1,10 @@
 package org.milfist.controllers;
 
+import static org.hamcrest.CoreMatchers.is;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.stream.Stream;
@@ -43,26 +45,34 @@ public class AppRestControllerTest {
 
 		try {
 			when(serviceMock.getTwitts(anyString())).thenReturn(this.stream());
-			this.mockMvc.perform(get("/search?filter='madrid'")).andExpect(status().isOk());
+			this.mockMvc.perform(get("/search?filter='madrid'"))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$[0]", is("A")))
+				.andExpect(jsonPath("$[1]", is("B")))
+				.andExpect(jsonPath("$[2]", is("C")))
+				.andReturn();
+
 		} catch (Exception e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
-
-		
-//		try {
-//			when(serviceMock.getTwitts("")).thenReturn(this.stream());
-//		} catch (TwitterException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
-
 	}
+	
+	@Test(expected = NullPointerException.class)
+	public void shouldBeErrorForFilterNull() {
+
+		try {
+//			when(serviceMock.getTwitts(anyString())).thenReturn(this.stream());
+			this.mockMvc.perform(get("/search"));
+
+		} catch (Exception e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+	}
+	
 
 	private Stream<String> stream() {
-		
-		
-		
 		return Stream.of("A", "B", "C");
 	}
 
