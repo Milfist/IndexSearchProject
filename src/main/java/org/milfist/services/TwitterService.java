@@ -12,9 +12,9 @@ public interface TwitterService {
 	public static final String AT = "@";
 	public static final String COLON = ":";
 	
-	List<?> getTwitts2(String filter) throws TwitterException;
+	public List<String> getTwitts(String filter) throws TwitterException;
 
-	public Stream<String> getTwitts(String filter) throws TwitterException;
+	public Stream<String> getTwittsExample(String filter) throws TwitterException;
 
 	public String getFormatedMessage(Status status);
 	

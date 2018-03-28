@@ -22,13 +22,13 @@ public class TwitterServiceImpl implements TwitterService {
 	@Autowired
 	private ElasticSearchService esService;
 	
-	public List<?> getTwitts2(String filter) throws TwitterException {
+	public List<String> getTwitts(String filter) throws TwitterException {
 		Twitter twitter = TwitterFactory.getSingleton();
 		QueryResult result = twitter.search(new Query(HASH.concat(filter)));
 		Gson gson = new Gson();		
 		
 		// TODO Refactor
-		List<?> list = result.getTweets().stream().map(gson::toJson).collect(Collectors.toList()); 
+		List<String> list = result.getTweets().stream().map(gson::toJson).collect(Collectors.toList()); 
 		
 		this.esService.indexing(list, filter);		
 				
@@ -37,7 +37,7 @@ public class TwitterServiceImpl implements TwitterService {
 		
 	}
 	
-	public Stream<String> getTwitts(String filter) throws TwitterException {
+	public Stream<String> getTwittsExample(String filter) throws TwitterException {
 		Twitter twitter = TwitterFactory.getSingleton();
 		QueryResult result = twitter.search(new Query(HASH.concat(filter)));
 		return result.getTweets().stream().map(status -> this.getFormatedMessage(status));
