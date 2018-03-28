@@ -6,7 +6,6 @@ import org.milfist.services.TwitterService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import twitter4j.TwitterException;
@@ -18,13 +17,13 @@ public class AppRestController {
 	@Autowired
 	private TwitterService service;
 
-	@RequestMapping(value = "/search", method = RequestMethod.GET, produces = "application/json")
-	public Object[] listar(String filter) throws TwitterException {
-		return service.getTwitts(filter).toArray();
+	@RequestMapping(value = "/searchExample", method = RequestMethod.GET, produces = "application/json")
+	public Object[] searchExample(String filter) throws TwitterException {
+		return service.getTwittsExample(filter).toArray();
 	}
 
-	@RequestMapping(value = "/search2", method = RequestMethod.GET, produces = "application/json")
-	public List<?> listar2(String filter) throws TwitterException {
-		return service.getTwitts2(filter);
+	@RequestMapping(value = "/search", method = RequestMethod.GET, produces = "application/json")
+	public List<String> search(String filter) throws TwitterException {
+		return service.getTwitts(filter);
 	}
 }
