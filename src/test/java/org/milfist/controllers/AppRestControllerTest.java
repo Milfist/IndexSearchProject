@@ -7,10 +7,14 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Stream;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.milfist.services.AppConfig;
 import org.milfist.services.TwitterService;
@@ -23,7 +27,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = {AppConfig.class})
+@ContextConfiguration(classes = { AppConfig.class })
 public class AppRestControllerTest {
 
 	@Mock
@@ -31,8 +35,11 @@ public class AppRestControllerTest {
 
 	@InjectMocks
 	private AppRestController appRestControllerMock;
-	
+
 	private MockMvc mockMvc;
+
+	@Rule
+	public ExpectedException expectedEx = ExpectedException.none();
 
 	@Before
 	public void setup() {
@@ -41,51 +48,58 @@ public class AppRestControllerTest {
 	}
 
 	@Test
-	public void dataIsExpectedWhenAFilterIsRecived() {
+	public void shouldBeOKWhenCallToExampleANDAFilterIsRecived() throws Exception {
 
-		try {
-			when(serviceMock.getTwitts(anyString())).thenReturn(this.stream());
-			this.mockMvc.perform(get("/search?filter='madrid'"))
-				.andExpect(status().isOk())
-				.andExpect(jsonPath("$[0]", is("A")))
-				.andExpect(jsonPath("$[1]", is("B")))
-				.andExpect(jsonPath("$[2]", is("C")))
-				.andReturn();
+		when(serviceMock.getTwittsExample(anyString())).thenReturn(this.getStream());
+		this.mockMvc.perform(get("/searchExample"))
+													.andExpect(status().isOk())
+													.andExpect(jsonPath("$[0]", is("A")))
+													.andExpect(jsonPath("$[1]", is("B")))
+													.andExpect(jsonPath("$[2]", is("C")))
+													.andReturn();
 
-		} catch (Exception e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
+	}
+
+	@Test
+	public void shouldBeThrowsExceptionWhenCallToExampleANDFilterISNull() throws Exception {
+
+		expectedEx.expect(Exception.class );
+		expectedEx.expectCause(org.hamcrest.Matchers.any(NullPointerException.class));
+			
+		this.mockMvc.perform(get("/searchExample"));
 	}
 	
-	@Test(expected = NullPointerException.class)
-	public void shouldBeErrorForFilterNull() {
+	@Test
+	public void shouldBeOKWhenCallToSearchANDAFilterIsRecived() throws Exception {
 
-		try {
-//			when(serviceMock.getTwitts(anyString())).thenReturn(this.stream());
-			this.mockMvc.perform(get("/search"));
-
-		} catch (Exception e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
+		when(serviceMock.getTwitts(anyString())).thenReturn(this.getResultList());
+		this.mockMvc.perform(get("/search"))
+											.andExpect(status().isOk())
+											.andExpect(jsonPath("$[0]", is("A")))
+											.andExpect(jsonPath("$[1]", is("B")))
+											.andExpect(jsonPath("$[2]", is("C")))
+											.andReturn();
 	}
-	
 
-	private Stream<String> stream() {
+	@Test
+	public void shouldBeThrowExceptionWhenCallSarchANDFilterISNull() throws Exception {
+
+		expectedEx.expect(Exception.class );
+		expectedEx.expectCause(org.hamcrest.Matchers.any(NullPointerException.class));
+			
+		this.mockMvc.perform(get("/search"));
+	}
+
+	private Stream<String> getStream() {
 		return Stream.of("A", "B", "C");
+	}
+	
+	private List<String> getResultList() {
+		List<String> list = new ArrayList<String>();
+		list.add("A");
+		list.add("B");
+		list.add("C");	
+		return list;
 	}
 
 }
-
-// @RequestMapping(value = "/search", method = RequestMethod.GET, produces =
-// "application/json")
-// public Object[] listar(String filter) throws TwitterException {
-// return service.getTwitts(filter).toArray();
-// }
-//
-// @RequestMapping(value = "/search2", method = RequestMethod.GET, produces =
-// "application/json")
-// public List<?> listar2(String filter) throws TwitterException {
-// return service.getTwitts2(filter);
-// }
