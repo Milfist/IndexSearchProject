@@ -11,23 +11,28 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
-import org.milfist.services.AppConfig;
+import org.milfist.common.AppConfig;
 import org.milfist.services.TwitterService;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
+import twitter4j.TwitterException;
+
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = { AppConfig.class })
+@WebMvcTest(value = AppRestController.class, secure = false)
 public class AppRestControllerTest {
 
 	@Mock
@@ -59,15 +64,15 @@ public class AppRestControllerTest {
 													.andReturn();
 
 	}
-
+	
 	@Test
-	public void shouldBeThrowsExceptionWhenCallToExampleANDFilterISNull() throws Exception {
-
-		expectedEx.expect(Exception.class );
-		expectedEx.expectCause(org.hamcrest.Matchers.any(NullPointerException.class));
-			
-		this.mockMvc.perform(get("/searchExample"));
-	}
+	public void testM() throws TwitterException {
+		when(serviceMock.getTwittsExample(anyString())).thenReturn(this.getStream());
+		Object[] stream = this.appRestControllerMock.searchExample(anyString());
+		
+		Assert.assertEquals(stream[0], this.getResultList().get(0));
+		
+	} 
 	
 	@Test
 	public void shouldBeOKWhenCallToSearchANDAFilterIsRecived() throws Exception {
@@ -80,9 +85,18 @@ public class AppRestControllerTest {
 											.andExpect(jsonPath("$[2]", is("C")))
 											.andReturn();
 	}
+	
+	@Test
+	public void shouldBeThrowsExceptionWhenCallToExampleANDFilterISNull() throws Exception {
+
+		expectedEx.expect(Exception.class );
+		expectedEx.expectCause(org.hamcrest.Matchers.any(NullPointerException.class));
+			
+		this.mockMvc.perform(get("/searchExample"));
+	}
 
 	@Test
-	public void shouldBeThrowExceptionWhenCallSarchANDFilterISNull() throws Exception {
+	public void shouldBeThrowExceptionWhenCallSearchANDFilterISNull() throws Exception {
 
 		expectedEx.expect(Exception.class );
 		expectedEx.expectCause(org.hamcrest.Matchers.any(NullPointerException.class));

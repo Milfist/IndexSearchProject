@@ -1,5 +1,9 @@
 package org.milfist.services;
 
+import static org.milfist.common.Constants.AT;
+import static org.milfist.common.Constants.COLON;
+import static org.milfist.common.Constants.HASH;
+
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -24,7 +28,7 @@ public class TwitterServiceImpl implements TwitterService {
 	
 	public List<String> getTwitts(String filter) throws TwitterException {
 		Twitter twitter = TwitterFactory.getSingleton();
-		QueryResult result = twitter.search(new Query(HASH.concat(filter)));
+		QueryResult result = twitter.search(new Query(HASH.getValue().concat(filter)));
 		Gson gson = new Gson();		
 		
 		// TODO Refactor
@@ -39,13 +43,13 @@ public class TwitterServiceImpl implements TwitterService {
 	
 	public Stream<String> getTwittsExample(String filter) throws TwitterException {
 		Twitter twitter = TwitterFactory.getSingleton();
-		QueryResult result = twitter.search(new Query(HASH.concat(filter)));
-		return result.getTweets().stream().map(status -> this.getFormatedMessage(status));
+		QueryResult result = twitter.search(new Query(HASH.getValue().concat(filter)));
+		return result.getTweets().stream().map(this::getFormatedMessage);
 	}
 
 	@Override
 	public String getFormatedMessage(Status status) {
-		return AT + status.getUser().getScreenName() + COLON + status.getText();
+		return AT.getValue() + status.getUser().getScreenName() + COLON.getValue() + status.getText();
 	}
 
 }
